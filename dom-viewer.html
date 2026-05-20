@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOM Viewer — Clearwater Consulting</title>
+  <script type="module" src="/src/index.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; background: #f7f5f1; color: #222; }
+    .header { background: #1c2b3a; padding: 0 60px; display: flex; align-items: center; justify-content: space-between; height: 70px; }
+    .header .logo { color: #fff; font-size: 20px; font-weight: bold; }
+    .header .logo span { color: #c9a84c; }
+    .nav a { color: #ccc; text-decoration: none; margin-left: 24px; font-size: 14px; font-family: Arial, sans-serif; }
+    .nav a:hover, .nav a.active { color: #c9a84c; }
+    .nav .dev-link { color: #c9a84c; border: 1px solid #c9a84c33; padding: 3px 10px; border-radius: 3px; }
+
+    .page-header { background: #243447; color: #fff; padding: 40px 60px; }
+    .page-header h1 { font-size: 32px; margin-bottom: 8px; }
+    .page-header p { font-size: 15px; color: #9ab; font-family: Arial, sans-serif; }
+
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 40px 60px; display: grid; grid-template-columns: 280px 1fr; gap: 32px; align-items: start; }
+
+    /* Legend panel */
+    .legend { background: #fff; border: 1px solid #ddd; padding: 24px; position: sticky; top: 20px; }
+    .legend h2 { font-size: 16px; color: #1c2b3a; margin-bottom: 16px; }
+    .legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-family: Arial, sans-serif; font-size: 13px; color: #555; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+
+    .info-box { background: #fffbf0; border-left: 4px solid #c9a84c; padding: 14px 16px; margin-bottom: 16px; font-family: Arial, sans-serif; font-size: 13px; color: #666; line-height: 1.7; }
+    .info-box strong { color: #1c2b3a; }
+
+    .controls { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .ctrl-btn { background: #1c2b3a; color: #fff; border: none; padding: 7px 16px; font-size: 12px; cursor: pointer; font-family: Arial, sans-serif; }
+    .ctrl-btn:hover { background: #c9a84c; color: #1c2b3a; }
+
+    /* DOM Tree */
+    .tree-panel { background: #fff; border: 1px solid #ddd; padding: 24px; overflow-x: auto; }
+    .tree-panel h2 { font-size: 16px; color: #1c2b3a; margin-bottom: 20px; font-family: Arial, sans-serif; }
+
+    .dom-tree { font-family: 'Courier New', Courier, monospace; font-size: 13px; line-height: 1.8; }
+    details { margin-left: 20px; }
+    details > summary { cursor: pointer; list-style: none; outline: none; padding: 1px 4px; border-radius: 2px; }
+    details > summary::-webkit-details-marker { display: none; }
+    details > summary:hover { background: #f0ecdf; }
+    details[open] > summary .close-tag { display: none; }
+
+    .tag-bracket { color: #888; }
+    .tag-name { color: #c0392b; font-weight: bold; }
+    .attr-key { color: #2980b9; }
+    .attr-val { color: #27ae60; }
+    .text-node { color: #8e44ad; font-style: italic; }
+    .comment-node { color: #95a5a6; font-style: italic; }
+    .children { margin-left: 20px; border-left: 1px dashed #ddd; padding-left: 4px; }
+    .close-tag-line { margin-left: 20px; }
+    .self-closing { color: #c0392b; }
+    .node-count { background: #c9a84c; color: #1c2b3a; font-size: 10px; padding: 1px 5px; border-radius: 10px; font-family: Arial, sans-serif; vertical-align: middle; margin-left: 6px; }
+
+    .footer { background: #111d27; color: #778; padding: 30px 60px; display: flex; justify-content: space-between; align-items: center; font-family: Arial, sans-serif; font-size: 13px; margin-top: 40px; }
+    .footer .footer-logo { color: #fff; font-size: 15px; font-weight: bold; }
+    .footer .footer-logo span { color: #c9a84c; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo">Clearwater<span>.</span>Consulting</div>
+    <div class="nav">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="dom-viewer.html" class="active dev-link">DOM</a>
+      <a href="console-lab.html" class="dev-link">Console Lab</a>
+    </div>
+  </div>
+
+  <div class="page-header">
+    <h1>DOM Viewer</h1>
+    <p>Live tree of the Document Object Model of this page — generated in real time by the browser.</p>
+  </div>
+
+  <div class="wrap">
+
+    <aside>
+      <div class="info-box">
+        <strong>What is the DOM?</strong><br>
+        The browser reads your HTML file and builds this tree of objects in memory. JavaScript interacts with these objects — not the original HTML file.
+      </div>
+
+      <div class="legend">
+        <h2>Legend</h2>
+        <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div> Element node — an HTML tag</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2980b9"></div> Attribute — name of an attribute</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#27ae60"></div> Attribute value — value in quotes</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#8e44ad"></div> Text node — visible text content</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#95a5a6"></div> Comment — HTML comment</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c9a84c"></div> Counter — number of child nodes</div>
+      </div>
+
+      <div class="info-box" style="margin-top:16px">
+        <strong>Tips:</strong><br>
+        ▶ Click any row to expand it.<br>
+        Every node with children shows a <span style="background:#c9a84c;color:#1c2b3a;padding:1px 5px;border-radius:10px;font-size:11px">count</span> badge.<br><br>
+        Open <strong>DevTools → Elements</strong> to compare this view with the browser's own DOM inspector.
+      </div>
+    </aside>
+
+    <div>
+      <div class="controls">
+        <button class="ctrl-btn" onclick="document.querySelectorAll('details').forEach(d=>d.open=true)">Expand All</button>
+        <button class="ctrl-btn" onclick="document.querySelectorAll('details').forEach(d=>d.open=false)">Collapse All</button>
+        <button class="ctrl-btn" onclick="location.reload()">Refresh Tree</button>
+      </div>
+      <div class="tree-panel">
+        <h2>document → <span style="color:#c0392b;font-family:monospace">&lt;html&gt;</span></h2>
+        <div class="dom-tree" id="tree-root"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-logo">Clearwater<span>.</span>Consulting</div>
+    <div>DOM rendered live by the browser &nbsp;|&nbsp; Open DevTools → Elements to inspect</div>
+    <div>&copy; 2026 Clearwater Consulting Ltd.</div>
+  </div>
+
+  <script>
+    const SKIP_TAGS = new Set(['SCRIPT', 'STYLE'])
+
+    function attrs(el) {
+      return Array.from(el.attributes).map(a => {
+        const val = a.value.length > 40 ? a.value.substring(0, 40) + '…' : a.value
+        return ` <span class="attr-key">${a.name}</span><span class="tag-bracket">=</span><span class="attr-val">"${val}"</span>`
+      }).join('')
+    }
+
+    function childCount(el) {
+      const count = Array.from(el.childNodes).filter(n => {
+        if (n.nodeType === 3) return n.textContent.trim().length > 0
+        return n.nodeType === 1 || n.nodeType === 8
+      }).length
+      return count > 0 ? `<span class="node-count">${count}</span>` : ''
+    }
+
+    function renderNode(node) {
+      if (node.nodeType === 8) {
+        const txt = node.textContent.trim().substring(0, 60)
+        return `<div class="comment-node">&lt;!-- ${txt} --&gt;</div>`
+      }
+
+      if (node.nodeType === 3) {
+        const txt = node.textContent.trim()
+        if (!txt) return ''
+        const display = txt.length > 80 ? txt.substring(0, 80) + '…' : txt
+        return `<div class="text-node">"${display}"</div>`
+      }
+
+      if (node.nodeType !== 1) return ''
+
+      const tag = node.tagName.toLowerCase()
+      const attrsHtml = attrs(node)
+      const openTag = `<span class="tag-bracket">&lt;</span><span class="tag-name">${tag}</span>${attrsHtml}<span class="tag-bracket">&gt;</span>`
+      const closeTag = `<span class="tag-bracket">&lt;/</span><span class="tag-name">${tag}</span><span class="tag-bracket">&gt;</span>`
+
+      if (SKIP_TAGS.has(node.tagName)) {
+        return `<div><span class="self-closing">${openTag}</span> <em style="color:#aaa;font-family:Arial;font-size:11px">[contents hidden]</em> ${closeTag}</div>`
+      }
+
+      const childNodes = Array.from(node.childNodes)
+      const renderedChildren = childNodes.map(renderNode).filter(Boolean).join('')
+
+      if (!renderedChildren) {
+        return `<div>${openTag}${closeTag}</div>`
+      }
+
+      return `
+        <details open>
+          <summary>${openTag}${childCount(node)}</summary>
+          <div class="children">${renderedChildren}</div>
+          <div class="close-tag-line">${closeTag}</div>
+        </details>`
+    }
+
+    document.getElementById('tree-root').innerHTML = renderNode(document.documentElement)
+
+    // Collapse deep nodes by default for readability
+    document.querySelectorAll('details').forEach((d, i) => {
+      const depth = d.closest('.dom-tree') ? 0 : 1
+      if (i > 2) d.open = false
+    })
+    // Keep top 3 open
+    const allDetails = document.querySelectorAll('#tree-root details')
+    allDetails.forEach((d, i) => { d.open = i < 4 })
+  </script>
+
+</body>
+</html>
