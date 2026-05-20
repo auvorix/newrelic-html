@@ -97,6 +97,12 @@
         <strong>Network tab:</strong><br>
         Switch to the <strong>Network</strong> tab and filter by <code>Fetch/XHR</code>. You will see each API call with its real HTTP status, response headers, and timing.
       </div>
+      <div class="info-box">
+        <strong>Where to find in New Relic:</strong><br>
+        <strong>JS Errors</strong> — all crash buttons + HTTP 4xx/5xx via <code>noticeError()</code><br>
+        <strong>AJAX</strong> — all fetch buttons with real status + timing<br>
+        <strong>Session Traces</strong> — full waterfall of what was triggered
+      </div>
       <div class="legend">
         <h2>What each section is</h2>
         <div class="leg-row"><div class="leg-dot" style="background:#52c41a"></div> Happy path — user succeeds</div>
@@ -187,11 +193,16 @@
       clientId:  'clt_' + Math.floor(300 + Math.random() * 700),
     }
 
-    function _reqId()  { return 'req_' + Math.random().toString(36).substr(2, 12) }
-    function _now()    { return new Date().toISOString() }
-    function _dur()    { return Math.floor(40 + Math.random() * 3200) }
+    function _reqId() { return 'req_' + Math.random().toString(36).substr(2, 12) }
+    function _now()   { return new Date().toISOString() }
 
-    // ── Page log (summary only) ──────────────────────────────────────────────
+    // Report a caught error to New Relic (noticeError) + console + page log
+    function _reportError(e, nrAttrs, consoleMsg, consoleCtx) {
+      console.error(consoleMsg, e, consoleCtx)
+      if (window.newrelic) newrelic.noticeError(e, nrAttrs)
+    }
+
+    // ── Page log ─────────────────────────────────────────────────────────────
     function log(cls, text) {
       const el = document.getElementById('live-log')
       const ph = el.querySelector('.log-dim')
@@ -211,12 +222,9 @@
       const requestId = _reqId()
       const t0 = performance.now()
 
-      // Production apps log outgoing requests
       console.log('[clearwater-api] outgoing request', {
         method, endpoint, requestId,
-        userId: _session.userId,
-        sessionId: _session.sessionId,
-        timestamp: _now(),
+        userId: _session.userId, sessionId: _session.sessionId, timestamp: _now(),
       })
 
       let res
@@ -224,13 +232,12 @@
         res = await fetch(`https://httpstat.us/${statusCode}`, { mode: 'cors' })
       } catch (networkErr) {
         const duration = Math.round(performance.now() - t0)
-        console.error('[clearwater-api] network failure', {
-          method, endpoint, requestId,
-          duration: duration + 'ms',
-          error: networkErr.message,
-          userId: _session.userId,
-          timestamp: _now(),
-        })
+        _reportError(
+          networkErr,
+          { requestId, endpoint, method, duration: duration + 'ms', userId: _session.userId },
+          '[clearwater-api] network failure',
+          { requestId, endpoint, duration: duration + 'ms', userId: _session.userId, timestamp: _now() }
+        )
         log('log-error', `NETWORK ERR  ${method} ${endpoint}`)
         return null
       }
@@ -238,58 +245,39 @@
       const duration = Math.round(performance.now() - t0)
       const status = res.status
 
-      if (status >= 500) {
-        console.error('[clearwater-api] server error', {
-          method, endpoint, requestId, status,
-          duration: duration + 'ms',
-          userId: _session.userId,
-          sessionId: _session.sessionId,
-          timestamp: _now(),
-        })
-        log('log-error', `${status}  ${method} ${endpoint}  (${duration}ms)`)
+      if (status >= 400) {
+        // Create an Error object so NR shows it in JS Errors tab
+        const httpErr = new Error(`HTTP ${status} on ${method} ${endpoint}`)
+        httpErr.name = status >= 500 ? 'ServerError' : 'ClientError'
 
-      } else if (status === 429) {
-        console.warn('[clearwater-api] rate limited', {
-          method, endpoint, requestId, status,
-          retryAfter: res.headers.get('retry-after') || '60',
-          userId: _session.userId,
-          timestamp: _now(),
-        })
-        log('log-warn', `${status}  ${method} ${endpoint}  rate limited`)
+        const ctx = { requestId, status, endpoint, method, duration: duration + 'ms',
+                      userId: _session.userId, sessionId: _session.sessionId, timestamp: _now() }
 
-      } else if (status === 401) {
-        console.warn('[clearwater-api] authentication required — session may have expired', {
-          method, endpoint, requestId, status,
-          sessionId: _session.sessionId,
-          userId: _session.userId,
-          timestamp: _now(),
-        })
-        log('log-warn', `${status}  ${method} ${endpoint}  session expired`)
+        if (status >= 500) {
+          console.error('[clearwater-api] server error', ctx)
+          log('log-error', `${status}  ${method} ${endpoint}  (${duration}ms)`)
+        } else if (status === 429) {
+          console.warn('[clearwater-api] rate limited', { ...ctx, retryAfter: res.headers.get('retry-after') || '60' })
+          log('log-warn', `${status}  ${method} ${endpoint}  rate limited`)
+        } else if (status === 401) {
+          console.warn('[clearwater-api] authentication required — session may have expired', ctx)
+          log('log-warn', `${status}  ${method} ${endpoint}  session expired`)
+        } else if (status === 403) {
+          console.warn('[clearwater-api] access denied', ctx)
+          log('log-warn', `${status}  ${method} ${endpoint}  access denied`)
+        } else {
+          console.warn('[clearwater-api] client error', ctx)
+          log('log-warn', `${status}  ${method} ${endpoint}  (${duration}ms)`)
+        }
 
-      } else if (status === 403) {
-        console.warn('[clearwater-api] access denied', {
-          method, endpoint, requestId, status,
-          userId: _session.userId,
-          clientId: _session.clientId,
-          timestamp: _now(),
-        })
-        log('log-warn', `${status}  ${method} ${endpoint}  access denied`)
-
-      } else if (status >= 400) {
-        console.warn('[clearwater-api] client error', {
-          method, endpoint, requestId, status,
-          duration: duration + 'ms',
-          userId: _session.userId,
-          timestamp: _now(),
-        })
-        log('log-warn', `${status}  ${method} ${endpoint}  (${duration}ms)`)
+        // Report HTTP errors to New Relic JS Errors tab
+        if (window.newrelic) newrelic.noticeError(httpErr, { requestId, status, endpoint, method,
+          duration: duration + 'ms', userId: _session.userId })
 
       } else {
         console.log('[clearwater-api] response OK', {
-          method, endpoint, requestId, status,
-          duration: duration + 'ms',
-          userId: _session.userId,
-          timestamp: _now(),
+          method, endpoint, requestId, status, duration: duration + 'ms',
+          userId: _session.userId, timestamp: _now(),
         })
         log('log-ok', `${status}  ${method} ${endpoint}  (${duration}ms)`)
       }
@@ -307,79 +295,50 @@
     // ── Client error scenarios ───────────────────────────────────────────────
     function scenario_incompleteForm() {
       console.warn('[clearwater-forms] validation failed before submit', {
-        component: 'ContactForm',
-        missingFields: ['company', 'projectDescription'],
-        userId: _session.userId,
-        timestamp: _now(),
+        component: 'ContactForm', missingFields: ['company', 'projectDescription'],
+        userId: _session.userId, timestamp: _now(),
       })
       _apiCall('POST', '/api/v1/contact', 422)
     }
-
     function scenario_sessionExpired() {
       console.warn('[clearwater-auth] token expired, redirecting to login', {
-        sessionId: _session.sessionId,
-        userId: _session.userId,
-        expiredAt: new Date(Date.now() - 3600000).toISOString(),
-        timestamp: _now(),
+        sessionId: _session.sessionId, userId: _session.userId,
+        expiredAt: new Date(Date.now() - 3600000).toISOString(), timestamp: _now(),
       })
       _apiCall('GET', '/api/v1/portal/me', 401)
     }
-
-    function scenario_forbidden() {
-      _apiCall('GET', '/api/v1/documents/client-302/strategic-brief.pdf', 403)
-    }
-
+    function scenario_forbidden()    { _apiCall('GET', '/api/v1/documents/client-302/strategic-brief.pdf', 403) }
     function scenario_notFound() {
       console.warn('[clearwater-reports] report not found — may have been archived', {
-        reportId: 'q3-2019-legacy',
-        userId: _session.userId,
-        timestamp: _now(),
+        reportId: 'q3-2019-legacy', userId: _session.userId, timestamp: _now(),
       })
       _apiCall('GET', '/api/v1/reports/q3-2019-legacy', 404)
     }
-
     function scenario_doubleSubmit() {
       console.warn('[clearwater-forms] duplicate submission detected', {
         component: 'BookingForm',
         existingBookingId: 'bkg_' + Math.floor(10000 + Math.random() * 90000),
-        userId: _session.userId,
-        timestamp: _now(),
+        userId: _session.userId, timestamp: _now(),
       })
       _apiCall('POST', '/api/v1/bookings', 409)
     }
-
     function scenario_rateLimited() {
-      console.warn('[clearwater-api] too many requests — client should back off', {
-        endpoint: 'POST /api/v1/contact',
-        userId: _session.userId,
-        requestsInWindow: 12,
-        windowMs: 60000,
-        timestamp: _now(),
-      })
       _apiCall('POST', '/api/v1/contact', 429)
     }
-
     function scenario_badPayload() {
-      console.warn('[clearwater-api] invalid query parameters', {
-        endpoint: 'GET /api/v1/reports',
-        invalidParams: { date: 'not-a-date', range: 'undefined' },
-        userId: _session.userId,
-        timestamp: _now(),
-      })
       _apiCall('GET', '/api/v1/reports?date=not-a-date&range=undefined', 400)
     }
 
     // ── Server error scenarios ───────────────────────────────────────────────
-    function scenario_generateReport()   { _apiCall('POST', '/api/v1/reports/generate', 500) }
-    function scenario_exportExcel()      { _apiCall('GET',  '/api/v1/exports/clients.xlsx', 502) }
-    function scenario_crmDown()          { _apiCall('POST', '/api/v1/crm/sync', 503) }
-    function scenario_salesforceTimeout(){ _apiCall('GET',  '/api/v1/crm/opportunities', 504) }
-    function scenario_storageLimit()     { _apiCall('POST', '/api/v1/documents/upload', 507) }
+    function scenario_generateReport()    { _apiCall('POST', '/api/v1/reports/generate', 500) }
+    function scenario_exportExcel()       { _apiCall('GET',  '/api/v1/exports/clients.xlsx', 502) }
+    function scenario_crmDown()           { _apiCall('POST', '/api/v1/crm/sync', 503) }
+    function scenario_salesforceTimeout() { _apiCall('GET',  '/api/v1/crm/opportunities', 504) }
+    function scenario_storageLimit()      { _apiCall('POST', '/api/v1/documents/upload', 507) }
 
     // ── JavaScript runtime crashes ───────────────────────────────────────────
 
     function crash_renderChart() {
-      // Simulates: chart component receives null from API, tries to read .data
       function buildChartDataset(apiResponse) {
         return apiResponse.data.results.map(r => ({ x: r.quarter, y: r.revenue }))
       }
@@ -390,140 +349,122 @@
       try {
         renderPortfolioChart(document.createElement('div'), null)
       } catch (e) {
-        console.error('[clearwater-charts] failed to render portfolio chart', e, {
-          component: 'PortfolioChart',
-          userId: _session.userId,
-          timestamp: _now(),
-        })
+        _reportError(e,
+          { component: 'PortfolioChart', userId: _session.userId, timestamp: _now() },
+          '[clearwater-charts] failed to render portfolio chart',
+          { component: 'PortfolioChart', userId: _session.userId, timestamp: _now() }
+        )
         log('log-error', 'JS TypeError — renderPortfolioChart: cannot read null.data.results')
       }
     }
 
     function crash_loadPreferences() {
-      // Simulates: module loaded out of order, UserPreferencesModule not defined
       function initDashboard(userId) {
-        return UserPreferencesModule.load(userId) // intentional ReferenceError
+        return UserPreferencesModule.load(userId)
       }
       try {
         initDashboard(_session.userId)
       } catch (e) {
-        console.error('[clearwater-dashboard] failed to initialise user preferences', e, {
-          component: 'Dashboard.init',
-          userId: _session.userId,
-          timestamp: _now(),
-        })
+        _reportError(e,
+          { component: 'Dashboard.init', userId: _session.userId, timestamp: _now() },
+          '[clearwater-dashboard] failed to initialise user preferences',
+          { component: 'Dashboard.init', userId: _session.userId, timestamp: _now() }
+        )
         log('log-error', 'JS ReferenceError — UserPreferencesModule is not defined')
       }
     }
 
     function crash_budgetCalc() {
-      // Simulates: circular formula in budget model causes stack overflow
       function calculateProjectedRevenue(quarter, depth) {
         return calculateProjectedRevenue(quarter - 1, depth + 1)
       }
       try {
         calculateProjectedRevenue(8, 0)
       } catch (e) {
-        console.error('[clearwater-financials] stack overflow in budget projection', e, {
-          component: 'BudgetModel.calculateProjectedRevenue',
-          userId: _session.userId,
-          timestamp: _now(),
-        })
+        _reportError(e,
+          { component: 'BudgetModel.calculateProjectedRevenue', userId: _session.userId, timestamp: _now() },
+          '[clearwater-financials] stack overflow in budget projection',
+          { component: 'BudgetModel.calculateProjectedRevenue', userId: _session.userId, timestamp: _now() }
+        )
         log('log-error', 'JS RangeError — Maximum call stack size exceeded (calculateProjectedRevenue)')
       }
     }
 
     function crash_paymentGateway() {
-      // Simulates: async payment call rejects and nobody catches it in time
-      function chargeConsultationFee(bookingId, amount) {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            reject(new Error('Payment gateway timeout after 30000ms — booking ' + bookingId))
-          }, 300)
+      // Truly unhandled — no .catch() — NR captures via window.unhandledrejection
+      const bookingId = 'bkg_' + Math.floor(10000 + Math.random() * 90000)
+      log('log-error', 'Unhandled Promise rejection — chargeConsultationFee timeout (check NR JS Errors)')
+      function chargeConsultationFee(bkId) {
+        return new Promise((_, reject) => {
+          setTimeout(() => reject(
+            Object.assign(new Error('Payment gateway timeout after 30000ms — booking ' + bkId), {
+              name: 'PaymentError', bookingId: bkId, amount: 4500, currency: 'EUR',
+              userId: _session.userId,
+            })
+          ), 300)
         })
       }
-      function processBookingPayment(bookingId) {
-        const p = chargeConsultationFee(bookingId, 4500)
-        // intentionally no .catch() — becomes unhandled rejection
-        p.catch(e => {
-          console.error('[clearwater-payments] unhandled payment failure', e, {
-            bookingId,
-            amount: 4500,
-            currency: 'EUR',
-            userId: _session.userId,
-            timestamp: _now(),
-          })
-          log('log-error', 'Unhandled Promise rejection — chargeConsultationFee timeout')
-        })
-      }
-      processBookingPayment('bkg_' + Math.floor(10000 + Math.random() * 90000))
+      // No .catch() — becomes unhandled rejection, NR captures automatically
+      chargeConsultationFee(bookingId)
     }
 
     function crash_sessionHandler() {
-      // Simulates: session expiry handler throws because DOM element no longer exists
       function onSessionExpiry() {
         function redirectToLogin() {
-          // element was removed by a previous navigation
           document.getElementById('portal-redirect-btn').click()
         }
         redirectToLogin()
       }
+      log('log-error', 'JS TypeError — onSessionExpiry: portal-redirect-btn is null')
       setTimeout(() => {
         try {
           onSessionExpiry()
         } catch (e) {
-          console.error('[clearwater-auth] session expiry handler crashed', e, {
-            component: 'SessionManager.onSessionExpiry',
-            sessionId: _session.sessionId,
-            userId: _session.userId,
-            timestamp: _now(),
-          })
-          log('log-error', 'JS TypeError — onSessionExpiry: portal-redirect-btn is null')
+          _reportError(e,
+            { component: 'SessionManager.onSessionExpiry', sessionId: _session.sessionId,
+              userId: _session.userId, timestamp: _now() },
+            '[clearwater-auth] session expiry handler crashed',
+            { component: 'SessionManager.onSessionExpiry', userId: _session.userId, timestamp: _now() }
+          )
         }
       }, 0)
     }
 
     function crash_parseResponse() {
-      // Simulates: server returns HTML error page but client expects JSON
       function parseApiResponse(responseText) {
         return JSON.parse(responseText)
       }
       function loadReportData(reportId) {
-        const htmlErrorPage = '<!DOCTYPE html><html><body>503 Service Unavailable</body></html>'
-        return parseApiResponse(htmlErrorPage)
+        return parseApiResponse('<!DOCTYPE html><html><body>503 Service Unavailable</body></html>')
       }
       try {
         loadReportData('report_q4_2025')
       } catch (e) {
-        console.error('[clearwater-reports] failed to parse API response — server may have returned an error page', e, {
-          component: 'ReportLoader.loadReportData',
-          reportId: 'report_q4_2025',
-          userId: _session.userId,
-          hint: 'Check Network tab — server likely responded with 5xx HTML instead of JSON',
-          timestamp: _now(),
-        })
+        _reportError(e,
+          { component: 'ReportLoader.loadReportData', reportId: 'report_q4_2025',
+            hint: 'server returned HTML instead of JSON', userId: _session.userId, timestamp: _now() },
+          '[clearwater-reports] failed to parse API response — server returned HTML instead of JSON',
+          { component: 'ReportLoader.loadReportData', userId: _session.userId, timestamp: _now() }
+        )
         log('log-error', 'JS SyntaxError — JSON.parse: unexpected token < in parseApiResponse')
       }
     }
 
     function crash_deprecatedMethod() {
       console.warn('[clearwater-api] deprecated endpoint in use — migrate before 2026-07-01', {
-        currentEndpoint:    'GET /api/v1/clients',
-        replacementEndpoint:'GET /api/v2/accounts',
-        calledFrom:         'ClientList.fetchAll',
-        userId: _session.userId,
-        timestamp: _now(),
+        currentEndpoint: 'GET /api/v1/clients', replacementEndpoint: 'GET /api/v2/accounts',
+        calledFrom: 'ClientList.fetchAll', userId: _session.userId, timestamp: _now(),
       })
-      log('log-warn', 'console.warn — deprecated /api/v1/clients still in use (migrate to /api/v2/accounts)')
+      log('log-warn', 'console.warn — deprecated /api/v1/clients still in use')
     }
 
     function crash_consoleTable() {
       const data = [
-        { endpoint: 'GET /api/v1/reports',       status: 200, p50: '142ms', p95: '890ms',  errors: 0 },
-        { endpoint: 'POST /api/v1/contact',       status: 200, p50: '310ms', p95: '1240ms', errors: 2 },
-        { endpoint: 'GET /api/v1/crm/opportunities', status: 504, p50: 'N/A',  p95: 'N/A',   errors: 47 },
-        { endpoint: 'GET /api/v1/exports/xlsx',   status: 502, p50: 'N/A',  p95: 'N/A',   errors: 13 },
-        { endpoint: 'POST /api/v1/reports/generate', status: 500, p50: 'N/A', p95: 'N/A',  errors: 8 },
+        { endpoint: 'GET /api/v1/reports',          status: 200, p50: '142ms', p95: '890ms',  errors: 0 },
+        { endpoint: 'POST /api/v1/contact',          status: 200, p50: '310ms', p95: '1240ms', errors: 2 },
+        { endpoint: 'GET /api/v1/crm/opportunities', status: 504, p50: 'N/A',   p95: 'N/A',    errors: 47 },
+        { endpoint: 'GET /api/v1/exports/xlsx',      status: 502, p50: 'N/A',   p95: 'N/A',    errors: 13 },
+        { endpoint: 'POST /api/v1/reports/generate', status: 500, p50: 'N/A',   p95: 'N/A',    errors: 8 },
       ]
       console.log('[clearwater-monitoring] endpoint health report — last 15 minutes')
       console.table(data)
