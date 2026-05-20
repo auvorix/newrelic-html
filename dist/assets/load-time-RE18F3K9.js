@@ -1,0 +1,1 @@
+import{aG as n,aP as i,at as r,ay as s,aQ as d}from"./index-Cgl5jDNk.js";import{a as l,V as m}from"./webdriver-detection-Bem-3Pmh.js";const t=new l(m.LOAD_TIME);if(n){const a=s.performance;i(()=>{setTimeout(()=>{var e;if(t.isValid||!a)return;const o=r();t.update({value:o?o.loadEventEnd:((e=a.timing)==null?void 0:e.loadEventEnd)-d})},0)},!0)}export{t as l};

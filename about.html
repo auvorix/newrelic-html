@@ -3,54 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NR Test HTML — About</title>
-
+  <title>About Us — Clearwater Consulting</title>
   <script type="module" src="/src/index.js"></script>
-
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #f4f4f4; color: #333; }
-    .header { background: #1a1a2e; color: #fff; padding: 20px 40px; }
-    .header h1 { font-size: 24px; }
-    .nav { background: #16213e; padding: 10px 40px; }
-    .nav a { color: #e0e0e0; text-decoration: none; margin-right: 20px; font-size: 15px; }
-    .nav a:hover, .nav a.active { color: #0f9b8e; }
-    .content { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    .content h2 { font-size: 28px; margin-bottom: 16px; }
-    .content p { line-height: 1.7; margin-bottom: 12px; color: #555; }
-    .card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 24px; margin-bottom: 20px; }
-    .footer { background: #1a1a2e; color: #aaa; text-align: center; padding: 20px; margin-top: 60px; font-size: 13px; }
+    body { font-family: Georgia, 'Times New Roman', serif; background: #fff; color: #222; }
+    .header { background: #1c2b3a; padding: 0 60px; display: flex; align-items: center; justify-content: space-between; height: 70px; }
+    .header .logo { color: #fff; font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+    .header .logo span { color: #c9a84c; }
+    .nav a { color: #ccc; text-decoration: none; margin-left: 28px; font-size: 14px; font-family: Arial, sans-serif; }
+    .nav a:hover, .nav a.active { color: #c9a84c; }
+
+    .page-header { background: #243447; color: #fff; padding: 50px 60px; }
+    .page-header h1 { font-size: 36px; margin-bottom: 10px; }
+    .page-header p { font-size: 16px; color: #9ab; font-family: Arial, sans-serif; }
+
+    .section { padding: 60px 60px; }
+    .section-alt { background: #f7f5f1; }
+    .section h2 { font-size: 28px; color: #1c2b3a; margin-bottom: 14px; }
+    .section p { font-size: 15px; color: #555; line-height: 1.9; font-family: Arial, sans-serif; margin-bottom: 16px; max-width: 720px; }
+
+    .team-grid { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 30px; }
+    .team-card { flex: 1; min-width: 200px; background: #fff; padding: 28px; border-top: 3px solid #c9a84c; box-shadow: 0 2px 6px rgba(0,0,0,.07); }
+    .team-card .name { font-size: 17px; font-weight: bold; color: #1c2b3a; margin-bottom: 4px; }
+    .team-card .role { font-size: 13px; color: #c9a84c; font-family: Arial, sans-serif; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .team-card p { font-size: 13px; color: #666; line-height: 1.7; font-family: Arial, sans-serif; }
+
+    .values { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 30px; }
+    .value { flex: 1; min-width: 180px; padding: 24px; background: #1c2b3a; color: #fff; }
+    .value h3 { font-size: 16px; color: #c9a84c; margin-bottom: 10px; }
+    .value p { font-size: 13px; color: #9ab; font-family: Arial, sans-serif; line-height: 1.7; }
+
+    .footer { background: #111d27; color: #778; padding: 40px 60px; display: flex; justify-content: space-between; align-items: center; font-family: Arial, sans-serif; font-size: 13px; }
+    .footer .footer-logo { color: #fff; font-size: 16px; font-weight: bold; }
+    .footer .footer-logo span { color: #c9a84c; }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>NR Test — Basic HTML</h1>
-  </div>
-
-  <div class="nav">
-    <a href="index.html">Home</a>
-    <a href="about.html" class="active">About</a>
-    <a href="contact.html">Contact</a>
-  </div>
-
-  <div class="content">
-    <h2>About</h2>
-    <p>This page exists to test that New Relic tracks navigation between pages on a static HTML site.</p>
-
-    <div class="card">
-      <h3>About this project</h3>
-      <p>A minimal static HTML site with three pages, deployed on Azure Static Web Apps. Automatically redeployed on every push to the main branch via GitHub Actions.</p>
+    <div class="logo">Clearwater<span>.</span>Consulting</div>
+    <div class="nav">
+      <a href="index.html">Home</a>
+      <a href="about.html" class="active">About</a>
+      <a href="contact.html">Contact</a>
     </div>
+  </div>
 
-    <div class="card">
-      <h3>Technology stack</h3>
-      <p>Plain HTML + CSS — no JavaScript framework, no build step. New Relic is injected via the copy/paste script snippet in the &lt;head&gt; of every page.</p>
+  <div class="page-header">
+    <h1>About Clearwater Consulting</h1>
+    <p>Independent advisory firm founded in Dublin in 2008.</p>
+  </div>
+
+  <div class="section">
+    <h2>Our Story</h2>
+    <p>Clearwater Consulting was founded in 2008 by Margaret Hennessy and David Lohan, two former partners at international consulting firms who believed that mid-market businesses deserved the same quality of strategic advice as the largest corporations — without the overhead and bureaucracy.</p>
+    <p>From a two-person office on Baggot Street, we have grown to a team of 34 consultants serving clients across Ireland, the UK, and continental Europe. We have maintained our independence throughout, taking no equity positions and accepting no retainer arrangements that could compromise objectivity.</p>
+    <p>Today, Clearwater is recognised by the Irish Management Institute as one of Ireland's leading independent advisory firms, with particular strength in financial services, professional services, and technology-enabled businesses.</p>
+  </div>
+
+  <div class="section section-alt">
+    <h2>Leadership Team</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="name">Margaret Hennessy</div>
+        <div class="role">Founding Partner &amp; CEO</div>
+        <p>Former McKinsey partner with 24 years of advisory experience. Specialises in corporate strategy and board-level governance.</p>
+      </div>
+      <div class="team-card">
+        <div class="name">David Lohan</div>
+        <div class="role">Founding Partner &amp; CFO</div>
+        <p>Formerly with Deloitte Corporate Finance. Leads all M&A, fundraising, and financial restructuring engagements.</p>
+      </div>
+      <div class="team-card">
+        <div class="name">Sinéad Byrne</div>
+        <div class="role">Director, Operations Practice</div>
+        <p>10 years in operations consulting across manufacturing, logistics, and professional services. MBA from UCD Smurfit.</p>
+      </div>
+      <div class="team-card">
+        <div class="name">Conor McCarthy</div>
+        <div class="role">Director, Technology Advisory</div>
+        <p>Specialist in digital transformation and technology strategy for traditional businesses undergoing structural change.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Our Values</h2>
+    <div class="values">
+      <div class="value"><h3>Independence</h3><p>We are privately owned, debt-free, and accept no commissions or referral fees. Our only obligation is to our clients.</p></div>
+      <div class="value"><h3>Rigour</h3><p>Every recommendation is grounded in data, tested against alternatives, and stress-tested with our peer review process before it reaches a client.</p></div>
+      <div class="value"><h3>Accountability</h3><p>We measure our success by client outcomes, not by engagement duration. We set targets and track them.</p></div>
+      <div class="value"><h3>Candour</h3><p>We tell clients what they need to hear, not what they want to hear. Honest advice, clearly delivered.</p></div>
     </div>
   </div>
 
   <div class="footer">
-    &copy; 2026 NR Test HTML — New Relic monitoring test site
+    <div class="footer-logo">Clearwater<span>.</span>Consulting</div>
+    <div>One Harcourt Street, Dublin 2 &nbsp;|&nbsp; +353 1 234 5678 &nbsp;|&nbsp; info@clearwaterconsulting.ie</div>
+    <div>&copy; 2026 Clearwater Consulting Ltd. All rights reserved.</div>
   </div>
 
 </body>

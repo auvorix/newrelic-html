@@ -3,54 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NR Test HTML — Home</title>
-
+  <title>Clearwater Consulting — Business Advisory Services</title>
   <script type="module" src="/src/index.js"></script>
-
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #f4f4f4; color: #333; }
-    .header { background: #1a1a2e; color: #fff; padding: 20px 40px; }
-    .header h1 { font-size: 24px; }
-    .nav { background: #16213e; padding: 10px 40px; }
-    .nav a { color: #e0e0e0; text-decoration: none; margin-right: 20px; font-size: 15px; }
-    .nav a:hover, .nav a.active { color: #0f9b8e; }
-    .content { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    .content h2 { font-size: 28px; margin-bottom: 16px; }
-    .content p { line-height: 1.7; margin-bottom: 12px; color: #555; }
-    .card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 24px; margin-bottom: 20px; }
-    .footer { background: #1a1a2e; color: #aaa; text-align: center; padding: 20px; margin-top: 60px; font-size: 13px; }
+    body { font-family: Georgia, 'Times New Roman', serif; background: #fff; color: #222; }
+
+    .header { background: #1c2b3a; padding: 0 60px; display: flex; align-items: center; justify-content: space-between; height: 70px; }
+    .header .logo { color: #fff; font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+    .header .logo span { color: #c9a84c; }
+    .nav a { color: #ccc; text-decoration: none; margin-left: 28px; font-size: 14px; font-family: Arial, sans-serif; }
+    .nav a:hover, .nav a.active { color: #c9a84c; }
+
+    .hero { background: #1c2b3a; color: #fff; padding: 80px 60px; }
+    .hero h1 { font-size: 42px; line-height: 1.2; max-width: 600px; margin-bottom: 20px; }
+    .hero h1 span { color: #c9a84c; }
+    .hero p { font-size: 18px; color: #aac; max-width: 540px; line-height: 1.7; margin-bottom: 32px; font-family: Arial, sans-serif; }
+    .btn { display: inline-block; background: #c9a84c; color: #1c2b3a; padding: 14px 32px; font-size: 15px; font-weight: bold; text-decoration: none; font-family: Arial, sans-serif; }
+    .btn:hover { background: #b8943e; }
+    .btn-outline { background: transparent; color: #c9a84c; border: 2px solid #c9a84c; margin-left: 14px; }
+    .btn-outline:hover { background: #c9a84c; color: #1c2b3a; }
+
+    .section { padding: 70px 60px; }
+    .section-alt { background: #f7f5f1; }
+    .section h2 { font-size: 30px; color: #1c2b3a; margin-bottom: 10px; }
+    .section .sub { font-size: 15px; color: #888; font-family: Arial, sans-serif; margin-bottom: 40px; }
+
+    .services-grid { display: flex; gap: 30px; flex-wrap: wrap; }
+    .service-card { flex: 1; min-width: 220px; background: #fff; border-top: 4px solid #c9a84c; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+    .service-card h3 { font-size: 18px; color: #1c2b3a; margin-bottom: 12px; }
+    .service-card p { font-size: 14px; color: #666; line-height: 1.7; font-family: Arial, sans-serif; }
+
+    .stats { display: flex; gap: 0; background: #1c2b3a; }
+    .stat { flex: 1; padding: 40px; text-align: center; border-right: 1px solid #2d3f52; }
+    .stat:last-child { border-right: none; }
+    .stat .number { font-size: 42px; color: #c9a84c; font-weight: bold; }
+    .stat .label { font-size: 13px; color: #9ab; font-family: Arial, sans-serif; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
+
+    .testimonial { background: #fff; padding: 32px; border-left: 5px solid #c9a84c; margin-bottom: 24px; }
+    .testimonial p { font-size: 16px; color: #444; line-height: 1.8; font-style: italic; }
+    .testimonial .author { margin-top: 14px; font-size: 13px; color: #888; font-family: Arial, sans-serif; font-style: normal; }
+
+    .footer { background: #111d27; color: #778; padding: 40px 60px; display: flex; justify-content: space-between; align-items: center; font-family: Arial, sans-serif; font-size: 13px; }
+    .footer .footer-logo { color: #fff; font-size: 16px; font-weight: bold; }
+    .footer .footer-logo span { color: #c9a84c; }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>NR Test — Basic HTML</h1>
-  </div>
-
-  <div class="nav">
-    <a href="index.html" class="active">Home</a>
-    <a href="about.html">About</a>
-    <a href="contact.html">Contact</a>
-  </div>
-
-  <div class="content">
-    <h2>Home Page</h2>
-    <p>This is a test site for New Relic Browser Monitoring. It uses basic HTML structure to verify that the New Relic agent loads correctly on every page.</p>
-
-    <div class="card">
-      <h3>What this site tests</h3>
-      <p>Page load time, JavaScript errors, AJAX requests, and user sessions — all tracked by the New Relic browser agent.</p>
+    <div class="logo">Clearwater<span>.</span>Consulting</div>
+    <div class="nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
     </div>
+  </div>
 
-    <div class="card">
-      <h3>Navigate the pages</h3>
-      <p>Use the navigation above to visit the About and Contact pages. Each page load will be tracked as a separate event in New Relic.</p>
+  <div class="hero">
+    <h1>Strategic Advice for <span>Lasting Growth</span></h1>
+    <p>We help mid-size businesses navigate complex decisions, improve operations, and build sustainable competitive advantage.</p>
+    <a href="contact.html" class="btn">Request a Consultation</a>
+    <a href="about.html" class="btn btn-outline">Our Approach</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="number">320+</div><div class="label">Clients Served</div></div>
+    <div class="stat"><div class="number">18</div><div class="label">Years in Business</div></div>
+    <div class="stat"><div class="number">94%</div><div class="label">Client Retention</div></div>
+    <div class="stat"><div class="number">€2.4B</div><div class="label">Value Generated</div></div>
+  </div>
+
+  <div class="section section-alt">
+    <h2>Our Services</h2>
+    <p class="sub">Integrated advisory solutions tailored to your industry and stage of growth.</p>
+    <div class="services-grid">
+      <div class="service-card">
+        <h3>Strategic Planning</h3>
+        <p>Market analysis, competitive positioning, and multi-year roadmaps aligned to your business objectives and resources.</p>
+      </div>
+      <div class="service-card">
+        <h3>Financial Advisory</h3>
+        <p>Capital structure optimisation, fundraising preparation, M&A due diligence, and financial modelling for key decisions.</p>
+      </div>
+      <div class="service-card">
+        <h3>Operations &amp; Efficiency</h3>
+        <p>Process re-engineering, cost reduction programmes, and technology adoption strategies to improve operating margins.</p>
+      </div>
+      <div class="service-card">
+        <h3>Leadership Development</h3>
+        <p>Executive coaching, succession planning, and organisational design to build high-performing management teams.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>What Our Clients Say</h2>
+    <p class="sub">Results from engagements across financial services, technology, and professional services.</p>
+    <div class="testimonial">
+      <p>"Clearwater helped us identify €1.2M in operational savings within six months. Their structured approach and deep industry knowledge set them apart from every other firm we evaluated."</p>
+      <div class="author">— CFO, Tier-2 Insurance Group, Dublin</div>
+    </div>
+    <div class="testimonial">
+      <p>"The strategic review they delivered gave our board the clarity we needed to pursue our Series B. We closed the round eight weeks later at a valuation we hadn't considered possible."</p>
+      <div class="author">— CEO, SaaS Platform, Cork</div>
     </div>
   </div>
 
   <div class="footer">
-    &copy; 2026 NR Test HTML — New Relic monitoring test site
+    <div class="footer-logo">Clearwater<span>.</span>Consulting</div>
+    <div>One Harcourt Street, Dublin 2 &nbsp;|&nbsp; +353 1 234 5678 &nbsp;|&nbsp; info@clearwaterconsulting.ie</div>
+    <div>&copy; 2026 Clearwater Consulting Ltd. All rights reserved.</div>
   </div>
 
 </body>

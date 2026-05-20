@@ -8,8 +8,5 @@
   },
   "devDependencies": {
     "vite": "^5.0.0"
-  },
-  "dependencies": {
-    "@newrelic/browser-agent": "^1.314.0"
   }
 }

@@ -3,61 +3,142 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NR Test HTML — Contact</title>
-
+  <title>Contact — Clearwater Consulting</title>
   <script type="module" src="/src/index.js"></script>
-
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #f4f4f4; color: #333; }
-    .header { background: #1a1a2e; color: #fff; padding: 20px 40px; }
-    .header h1 { font-size: 24px; }
-    .nav { background: #16213e; padding: 10px 40px; }
-    .nav a { color: #e0e0e0; text-decoration: none; margin-right: 20px; font-size: 15px; }
-    .nav a:hover, .nav a.active { color: #0f9b8e; }
-    .content { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    .content h2 { font-size: 28px; margin-bottom: 16px; }
-    .content p { line-height: 1.7; margin-bottom: 12px; color: #555; }
-    .card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 24px; margin-bottom: 20px; }
-    label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; }
-    input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin-bottom: 16px; }
-    button { background: #0f9b8e; color: #fff; border: none; padding: 12px 28px; border-radius: 4px; cursor: pointer; font-size: 15px; }
-    button:hover { background: #0c7a6f; }
-    .footer { background: #1a1a2e; color: #aaa; text-align: center; padding: 20px; margin-top: 60px; font-size: 13px; }
+    body { font-family: Georgia, 'Times New Roman', serif; background: #fff; color: #222; }
+    .header { background: #1c2b3a; padding: 0 60px; display: flex; align-items: center; justify-content: space-between; height: 70px; }
+    .header .logo { color: #fff; font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+    .header .logo span { color: #c9a84c; }
+    .nav a { color: #ccc; text-decoration: none; margin-left: 28px; font-size: 14px; font-family: Arial, sans-serif; }
+    .nav a:hover, .nav a.active { color: #c9a84c; }
+
+    .page-header { background: #243447; color: #fff; padding: 50px 60px; }
+    .page-header h1 { font-size: 36px; margin-bottom: 10px; }
+    .page-header p { font-size: 16px; color: #9ab; font-family: Arial, sans-serif; }
+
+    .contact-wrap { display: flex; gap: 60px; padding: 60px; align-items: flex-start; }
+
+    .contact-info { flex: 0 0 300px; }
+    .contact-info h2 { font-size: 22px; color: #1c2b3a; margin-bottom: 24px; }
+    .info-item { margin-bottom: 24px; }
+    .info-item .label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #c9a84c; font-family: Arial, sans-serif; margin-bottom: 6px; }
+    .info-item p { font-size: 14px; color: #555; font-family: Arial, sans-serif; line-height: 1.7; }
+    .hours { background: #f7f5f1; padding: 20px; margin-top: 30px; border-left: 4px solid #c9a84c; }
+    .hours h3 { font-size: 14px; color: #1c2b3a; margin-bottom: 10px; }
+    .hours p { font-size: 13px; color: #777; font-family: Arial, sans-serif; line-height: 1.8; }
+
+    .contact-form { flex: 1; }
+    .contact-form h2 { font-size: 22px; color: #1c2b3a; margin-bottom: 24px; }
+    .form-row { display: flex; gap: 20px; margin-bottom: 20px; }
+    .form-group { flex: 1; }
+    label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #888; font-family: Arial, sans-serif; margin-bottom: 6px; }
+    input, select, textarea { width: 100%; padding: 12px 14px; border: 1px solid #ddd; font-size: 14px; font-family: Arial, sans-serif; color: #333; background: #fafafa; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #c9a84c; background: #fff; }
+    textarea { resize: vertical; }
+    .submit-btn { background: #1c2b3a; color: #fff; border: none; padding: 14px 36px; font-size: 15px; cursor: pointer; font-family: Arial, sans-serif; margin-top: 8px; }
+    .submit-btn:hover { background: #c9a84c; color: #1c2b3a; }
+    .disclaimer { font-size: 12px; color: #aaa; font-family: Arial, sans-serif; margin-top: 12px; line-height: 1.6; }
+
+    .footer { background: #111d27; color: #778; padding: 40px 60px; display: flex; justify-content: space-between; align-items: center; font-family: Arial, sans-serif; font-size: 13px; }
+    .footer .footer-logo { color: #fff; font-size: 16px; font-weight: bold; }
+    .footer .footer-logo span { color: #c9a84c; }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>NR Test — Basic HTML</h1>
-  </div>
-
-  <div class="nav">
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="contact.html" class="active">Contact</a>
-  </div>
-
-  <div class="content">
-    <h2>Contact</h2>
-    <p>This form is static — it does not submit anywhere. It exists to generate user interaction events for New Relic to track.</p>
-
-    <div class="card">
-      <label for="name">Name</label>
-      <input type="text" id="name" placeholder="Your name">
-
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="your@email.com">
-
-      <label for="message">Message</label>
-      <textarea id="message" rows="5" placeholder="Your message..."></textarea>
-
-      <button type="button" onclick="alert('Form is static — for testing only')">Send Message</button>
+    <div class="logo">Clearwater<span>.</span>Consulting</div>
+    <div class="nav">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="contact.html" class="active">Contact</a>
     </div>
   </div>
 
+  <div class="page-header">
+    <h1>Get in Touch</h1>
+    <p>We respond to all enquiries within one business day.</p>
+  </div>
+
+  <div class="contact-wrap">
+
+    <div class="contact-info">
+      <h2>Our Office</h2>
+      <div class="info-item">
+        <div class="label">Address</div>
+        <p>One Harcourt Street<br>Dublin 2, D02 XY12<br>Ireland</p>
+      </div>
+      <div class="info-item">
+        <div class="label">Phone</div>
+        <p>+353 1 234 5678</p>
+      </div>
+      <div class="info-item">
+        <div class="label">Email</div>
+        <p>info@clearwaterconsulting.ie<br>new.clients@clearwaterconsulting.ie</p>
+      </div>
+      <div class="info-item">
+        <div class="label">Company Registration</div>
+        <p>Clearwater Consulting Ltd.<br>CRO No. 412807</p>
+      </div>
+      <div class="hours">
+        <h3>Business Hours</h3>
+        <p>Monday – Friday: 8:30am – 6:00pm<br>Saturday: By appointment only<br>Sunday: Closed</p>
+      </div>
+    </div>
+
+    <div class="contact-form">
+      <h2>Send an Enquiry</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first-name">First Name</label>
+          <input type="text" id="first-name" placeholder="Margaret">
+        </div>
+        <div class="form-group">
+          <label for="last-name">Last Name</label>
+          <input type="text" id="last-name" placeholder="Hennessy">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Business Email</label>
+          <input type="email" id="email" placeholder="you@company.com">
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" placeholder="+353 1 000 0000">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:20px">
+        <label for="company">Company Name</label>
+        <input type="text" id="company" placeholder="Your company">
+      </div>
+      <div class="form-group" style="margin-bottom:20px">
+        <label for="service">Service of Interest</label>
+        <select id="service">
+          <option value="">— Select a service —</option>
+          <option>Strategic Planning</option>
+          <option>Financial Advisory</option>
+          <option>Operations &amp; Efficiency</option>
+          <option>Leadership Development</option>
+          <option>Other / Not Sure</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:20px">
+        <label for="message">Message</label>
+        <textarea id="message" rows="5" placeholder="Briefly describe your situation and what you are looking to achieve..."></textarea>
+      </div>
+      <button class="submit-btn" type="button">Submit Enquiry</button>
+      <p class="disclaimer">By submitting this form you agree to our Privacy Policy. We do not share your information with third parties and will only contact you in response to this enquiry.</p>
+    </div>
+
+  </div>
+
   <div class="footer">
-    &copy; 2026 NR Test HTML — New Relic monitoring test site
+    <div class="footer-logo">Clearwater<span>.</span>Consulting</div>
+    <div>One Harcourt Street, Dublin 2 &nbsp;|&nbsp; +353 1 234 5678 &nbsp;|&nbsp; info@clearwaterconsulting.ie</div>
+    <div>&copy; 2026 Clearwater Consulting Ltd. All rights reserved.</div>
   </div>
 
 </body>

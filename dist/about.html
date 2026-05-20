@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NR Test HTML — About</title>
+
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; color: #333; }
+    .header { background: #1a1a2e; color: #fff; padding: 20px 40px; }
+    .header h1 { font-size: 24px; }
+    .nav { background: #16213e; padding: 10px 40px; }
+    .nav a { color: #e0e0e0; text-decoration: none; margin-right: 20px; font-size: 15px; }
+    .nav a:hover, .nav a.active { color: #0f9b8e; }
+    .content { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    .content h2 { font-size: 28px; margin-bottom: 16px; }
+    .content p { line-height: 1.7; margin-bottom: 12px; color: #555; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 24px; margin-bottom: 20px; }
+    .footer { background: #1a1a2e; color: #aaa; text-align: center; padding: 20px; margin-top: 60px; font-size: 13px; }
+  </style>
+  <script type="module" crossorigin src="/assets/index-Cgl5jDNk.js"></script>
+</head>
+<body>
+
+  <div class="header">
+    <h1>NR Test — Basic HTML</h1>
+  </div>
+
+  <div class="nav">
+    <a href="index.html">Home</a>
+    <a href="about.html" class="active">About</a>
+    <a href="contact.html">Contact</a>
+  </div>
+
+  <div class="content">
+    <h2>About</h2>
+    <p>This page exists to test that New Relic tracks navigation between pages on a static HTML site.</p>
+
+    <div class="card">
+      <h3>About this project</h3>
+      <p>A minimal static HTML site with three pages, deployed on Azure Static Web Apps. Automatically redeployed on every push to the main branch via GitHub Actions.</p>
+    </div>
+
+    <div class="card">
+      <h3>Technology stack</h3>
+      <p>Plain HTML + CSS — no JavaScript framework, no build step. New Relic is injected via the copy/paste script snippet in the &lt;head&gt; of every page.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    &copy; 2026 NR Test HTML — New Relic monitoring test site
+  </div>
+
+</body>
+</html>
